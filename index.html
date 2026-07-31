@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FFF5F8">
+<title>喵喵的棒棒糖梦工厂</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100dvh;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+body{background:#1a0a2e;display:flex;justify-content:center;align-items:center}
+#game{width:100%;max-width:960px;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#FFF5F8}
+.header{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:rgba(255,255,255,.9);z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.header .brand{font-size:clamp(18px,3vw,28px);font-weight:800;color:#E75480}
+.header .coins{font-size:clamp(20px,3vw,28px);font-weight:800;color:#FF9500;display:flex;align-items:center;gap:4px}
+#pixi-stage{flex:1 1 auto;min-height:0;position:relative;overflow:hidden}
+#pixi-stage canvas{display:block}
+.controls{flex-shrink:0;padding:clamp(8px,1.2vw,14px);background:rgba(255,255,255,.95);z-index:10;box-shadow:0 -2px 12px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1vw,10px)}
+.step-bar{display:flex;gap:clamp(6px,1.2vw,10px)}
+.step-dot{padding:clamp(6px,1vw,10px) clamp(12px,2vw,18px);border-radius:20px;background:#FFE0E9;color:#E75480;font-size:clamp(13px,2vw,16px);font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
+.step-dot.active{background:#E75480;color:#FFF;transform:scale(1.05);box-shadow:0 4px 12px rgba(231,84,128,.4)}
+.step-title{font-size:clamp(16px,2.5vw,24px);font-weight:700;color:#E75480}
+.btn-row{display:flex;justify-content:center;gap:clamp(10px,2vw,16px);flex-wrap:wrap}
+.btn-sel{width:clamp(84px,22vw,160px);height:clamp(84px,22vw,160px);border-radius:clamp(18px,3vw,26px);border:4px solid #E8E8E8;background:#FFF;font-size:clamp(32px,8vw,56px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;box-shadow:0 5px 0 #DDD}
+.btn-sel:active{transform:translateY(4px);box-shadow:0 1px 0 #DDD}
+.btn-sel.selected{border-color:#E75480;background:#FFF0F5;transform:scale(1.1);box-shadow:0 6px 20px rgba(231,84,128,.35)}
+.btn-finish{background:linear-gradient(135deg,#E75480,#FF8E53);color:#FFF;border:none;border-radius:20px;padding:clamp(14px,2vw,18px) clamp(28px,5vw,40px);font-size:clamp(18px,2.5vw,24px);font-weight:800;cursor:pointer;box-shadow:0 5px 0 #C44569;font-family:inherit;transition:all .1s}
+.btn-finish:active{transform:translateY(3px);box-shadow:0 2px 0 #C44569}
+.diff-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.9);border-radius:10px;padding:4px 12px;font-size:14px;font-weight:700;color:#E75480;z-index:5;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="header">
+    <div class="brand">🐱 喵喵棒棒糖梦工厂</div>
+    <div class="coins" id="coins-display">🪙 <span id="coin-count">0</span></div>
+  </div>
+  <div id="pixi-stage"></div>
+  <div class="diff-badge" id="diff-badge">⭐ 入门</div>
+  <div class="controls" id="controls">
+    <div class="step-bar">
+      <button class="step-dot active" onclick="window.game?.goStep(1)">① 选水果</button>
+      <button class="step-dot" onclick="window.game?.goStep(2)">② 选模具</button>
+      <button class="step-dot" onclick="window.game?.goStep(3)">③ 撒装饰</button>
+    </div>
+    <div class="step-title" id="step-title">① 选一个水果</div>
+    <div class="btn-row" id="step-row"></div>
+    <button class="btn-finish" id="btn-finish" style="display:none" onclick="window.game?.finish()">✨ 完成！</button>
+  </div>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
