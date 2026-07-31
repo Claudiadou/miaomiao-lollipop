@@ -5,50 +5,297 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FFF5F8">
-<title>喵喵的棒棒糖梦工厂</title>
+<title>喵喵棒棒糖梦工厂</title>
 <style>
+:root{--primary:#E75480}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100dvh;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 body{background:#1a0a2e;display:flex;justify-content:center;align-items:center}
-#game{width:100%;max-width:960px;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#FFF5F8}
-.header{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:rgba(255,255,255,.9);z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.header .brand{font-size:clamp(18px,3vw,28px);font-weight:800;color:#E75480}
-.header .coins{font-size:clamp(20px,3vw,28px);font-weight:800;color:#FF9500;display:flex;align-items:center;gap:4px}
-#pixi-stage{flex:1 1 auto;min-height:0;position:relative;overflow:hidden}
-#pixi-stage canvas{display:block}
+#game{width:100%;max-width:960px;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.header{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:rgba(255,255,255,.92);z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.header .brand{font-size:clamp(18px,3vw,28px);font-weight:800;color:var(--primary)}
+.header .coins{font-size:clamp(20px,3vw,28px);font-weight:800;color:#FF9500}
+#stage-wrap{flex:1 1 auto;min-height:0;position:relative;overflow:hidden}
+#pixi-canvas{position:absolute;inset:0;z-index:1}
+#pixi-canvas canvas{display:block}
+.cat-el{position:absolute;font-size:clamp(60px,13vw,120px);z-index:3;pointer-events:none;transition:transform .3s}
+.customer-el{position:absolute;font-size:clamp(54px,12vw,110px);z-index:3;pointer-events:none;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.bubble-el{position:absolute;z-index:4;pointer-events:none;background:#FFF;border:3px solid var(--primary);border-radius:clamp(14px,2.5vw,22px);padding:clamp(4px,1vw,8px) clamp(10px,2vw,16px);font-size:clamp(18px,3vw,28px);box-shadow:0 4px 0 rgba(0,0,0,.08);white-space:nowrap;animation:float 1.2s ease-in-out infinite}
+.bubble-el::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#FFF;border-bottom:none}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.diff-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.9);border-radius:10px;padding:4px 12px;font-size:14px;font-weight:700;color:var(--primary);z-index:5;pointer-events:none}
+.press-hint{position:absolute;bottom:20%;left:50%;transform:translateX(-50%);font-size:clamp(14px,2.2vw,20px);color:var(--primary);font-weight:700;z-index:5;pointer-events:none;text-align:center;background:rgba(255,255,255,.85);padding:6px 16px;border-radius:16px;transition:opacity .3s}
 .controls{flex-shrink:0;padding:clamp(8px,1.2vw,14px);background:rgba(255,255,255,.95);z-index:10;box-shadow:0 -2px 12px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1vw,10px)}
 .step-bar{display:flex;gap:clamp(6px,1.2vw,10px)}
-.step-dot{padding:clamp(6px,1vw,10px) clamp(12px,2vw,18px);border-radius:20px;background:#FFE0E9;color:#E75480;font-size:clamp(13px,2vw,16px);font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
-.step-dot.active{background:#E75480;color:#FFF;transform:scale(1.05);box-shadow:0 4px 12px rgba(231,84,128,.4)}
-.step-title{font-size:clamp(16px,2.5vw,24px);font-weight:700;color:#E75480}
+.step-dot{padding:clamp(6px,1vw,10px) clamp(12px,2vw,18px);border-radius:20px;background:#FFE0E9;color:var(--primary);font-size:clamp(13px,2vw,16px);font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
+.step-dot.active{background:var(--primary);color:#FFF;transform:scale(1.05);box-shadow:0 4px 12px rgba(231,84,128,.4)}
+.step-title{font-size:clamp(16px,2.5vw,24px);font-weight:700;color:var(--primary)}
 .btn-row{display:flex;justify-content:center;gap:clamp(10px,2vw,16px);flex-wrap:wrap}
-.btn-sel{width:clamp(84px,22vw,160px);height:clamp(84px,22vw,160px);border-radius:clamp(18px,3vw,26px);border:4px solid #E8E8E8;background:#FFF;font-size:clamp(32px,8vw,56px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;box-shadow:0 5px 0 #DDD}
+.btn-sel{width:clamp(84px,22vw,160px);height:clamp(84px,22vw,160px);border-radius:clamp(18px,3vw,26px);border:4px solid #E8E8E8;background:#FFF;font-size:clamp(34px,8vw,58px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;box-shadow:0 5px 0 #DDD}
 .btn-sel:active{transform:translateY(4px);box-shadow:0 1px 0 #DDD}
-.btn-sel.selected{border-color:#E75480;background:#FFF0F5;transform:scale(1.1);box-shadow:0 6px 20px rgba(231,84,128,.35)}
-.btn-finish{background:linear-gradient(135deg,#E75480,#FF8E53);color:#FFF;border:none;border-radius:20px;padding:clamp(14px,2vw,18px) clamp(28px,5vw,40px);font-size:clamp(18px,2.5vw,24px);font-weight:800;cursor:pointer;box-shadow:0 5px 0 #C44569;font-family:inherit;transition:all .1s}
+.btn-sel.selected{border-color:var(--primary);background:#FFF0F5;transform:scale(1.1);box-shadow:0 6px 20px rgba(231,84,128,.35)}
+.btn-finish{background:linear-gradient(135deg,var(--primary),#FF8E53);color:#FFF;border:none;border-radius:20px;padding:clamp(14px,2vw,18px) clamp(28px,5vw,40px);font-size:clamp(18px,2.5vw,24px);font-weight:800;cursor:pointer;box-shadow:0 5px 0 #C44569;font-family:inherit;transition:all .1s}
 .btn-finish:active{transform:translateY(3px);box-shadow:0 2px 0 #C44569}
-.diff-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.9);border-radius:10px;padding:4px 12px;font-size:14px;font-weight:700;color:#E75480;z-index:5;pointer-events:none}
 </style>
 </head>
 <body>
 <div id="game">
   <div class="header">
     <div class="brand">🐱 喵喵棒棒糖梦工厂</div>
-    <div class="coins" id="coins-display">🪙 <span id="coin-count">0</span></div>
+    <div class="coins">🪙 <span id="coin-count">0</span></div>
   </div>
-  <div id="pixi-stage"></div>
-  <div class="diff-badge" id="diff-badge">⭐ 入门</div>
+
+  <div id="stage-wrap">
+    <div id="pixi-canvas"></div>
+    <div class="cat-el" id="cat-el">🐱</div>
+    <div class="customer-el" id="customer-el">🐰</div>
+    <div class="bubble-el" id="bubble-el">🍓 + ⭐</div>
+    <div class="press-hint" id="press-hint">👆 选一个水果放进锅里吧~</div>
+    <div class="diff-badge" id="diff-badge">⭐ 入门</div>
+  </div>
+
   <div class="controls" id="controls">
     <div class="step-bar">
-      <button class="step-dot active" onclick="window.game?.goStep(1)">① 选水果</button>
-      <button class="step-dot" onclick="window.game?.goStep(2)">② 选模具</button>
-      <button class="step-dot" onclick="window.game?.goStep(3)">③ 撒装饰</button>
+      <button class="step-dot active" onclick="goStep(1)">① 选水果</button>
+      <button class="step-dot" onclick="goStep(2)">② 选模具</button>
+      <button class="step-dot" onclick="goStep(3)">③ 撒装饰</button>
     </div>
     <div class="step-title" id="step-title">① 选一个水果</div>
     <div class="btn-row" id="step-row"></div>
-    <button class="btn-finish" id="btn-finish" style="display:none" onclick="window.game?.finish()">✨ 完成！</button>
+    <button class="btn-finish" id="btn-finish" style="display:none" onclick="finish()">✨ 完成！</button>
   </div>
 </div>
-<script type="module" src="/src/main.ts"></script>
+
+<script type="module">
+import * as PIXI from 'pixi.js';
+
+// === DATA ===
+const FRUITS = [
+  { emoji:'🍓', color:0xF15B5B },{ emoji:'🍌', color:0xFFD700 },{ emoji:'🍇', color:0xAB47BC },
+  { emoji:'🍏', color:0x66BB6A },{ emoji:'🫐', color:0x42A5F5 },{ emoji:'🍊', color:0xFFA726 }
+];
+const MOLDS = [{ emoji:'⭐' },{ emoji:'💖' },{ emoji:'🧸' },{ emoji:'🐾' },{ emoji:'🚀' },{ emoji:'🟣' }];
+const DECORS = [{ emoji:'🌈' },{ emoji:'🌟' },{ emoji:'🍫' },{ emoji:'🌸' },{ emoji:'💕' },{ emoji:'🍬' }];
+const CUSTOMERS = ['🐰','🐻','🦊','🐸','🐶','🐱','🐼','🐨','🐯','🐮','🐷','🐵'];
+const STAGES = [{ n:3, t:0, s:'⭐', name:'入门' },{ n:4, t:25, s:'⭐⭐', name:'进阶' },{ n:6, t:60, s:'⭐⭐⭐', name:'熟练' }];
+
+// === STATE ===
+let coins = parseInt(localStorage.getItem('mm_coins')||'0');
+let step = 1, stageIdx = 0, pickedF = -1, pickedM = -1;
+let pickedD = [];
+let targetF = 0, targetM = 0, lastCust = -1, locked = false;
+
+// === AUDIO ===
+let actx = null;
+function ac(){ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+function tone(f,d,t='sine',v=.1){ try{ let c=ac(),o=c.createOscillator(),g=c.createGain(); o.type=t; o.frequency.value=f; g.gain.setValueAtTime(v,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+d); }catch(e){} }
+const sfx = {
+  tap:()=>tone(800,.06), pour:()=>{tone(400,.12,'triangle');setTimeout(()=>tone(300,.15,'triangle'),100)},
+  pop:()=>{tone(600,.08);setTimeout(()=>tone(900,.1),80);setTimeout(()=>tone(1200,.12),150)},
+  correct:()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>tone(f,.12),i*100))},
+};
+
+// === DOM REFS ===
+const $=id=>document.getElementById(id);
+const coinCount = $('coin-count');
+const diffBadge = $('diff-badge');
+const stepTitle = $('step-title');
+const stepRow = $('step-row');
+const btnFinish = $('btn-finish');
+const bubbleEl = $('bubble-el');
+const customerEl = $('customer-el');
+const catEl = $('cat-el');
+const pressHint = $('press-hint');
+const stepDots = document.querySelectorAll('.step-dot');
+
+// === PIXI SETUP ===
+const pixiEl = $('pixi-canvas');
+const app = new PIXI.Application({
+  resizeTo: pixiEl, backgroundAlpha: 0, antialias: true,
+  resolution: Math.min(window.devicePixelRatio||1,2), autoDensity: true,
+});
+pixiEl.appendChild(app.view);
+const bgLayer = new PIXI.Container();
+const fxLayer = new PIXI.Container();
+const lolliLayer = new PIXI.Container();
+app.stage.addChild(bgLayer, fxLayer, lolliLayer);
+
+let pot, lolliPreview;
+let W=400,H=600;
+
+function buildBg(){
+  bgLayer.removeChildren();
+  W=app.screen.width; H=app.screen.height;
+  const bg=new PIXI.Graphics();
+  bg.beginFill(0xB3E5FC);bg.drawRect(0,0,W,H*.28);bg.endFill();
+  bg.beginFill(0x81D4FA);bg.drawRect(0,H*.26,W,H*.04);bg.endFill();
+  bg.beginFill(0xE8D5B7);bg.drawRect(0,H*.30,W,H*.04);bg.endFill();
+  bg.beginFill(0xDEB887);bg.drawRect(0,H*.35,W,H*.03);bg.endFill();
+  bg.beginFill(0xFFE4C9);bg.drawRect(0,H*.38,W,H*.62);bg.endFill();
+  bg.beginFill(0xDEB887);bg.drawRoundedRect(W*.06,H*.58,W*.88,clamp(10,18),7);bg.endFill();
+  bgLayer.addChild(bg);
+  // Pot
+  if(pot) fxLayer.removeChild(pot);
+  pot = new PIXI.Container(); pot.x=W*.5; pot.y=H*.53; fxLayer.addChild(pot);
+  drawPot();
+  // Lollipop preview
+  if(lolliPreview) lolliLayer.removeChild(lolliPreview);
+  lolliPreview = new PIXI.Container(); lolliPreview.x=W*.5; lolliPreview.y=H*.32; lolliPreview.scale.set(0);
+  lolliLayer.addChild(lolliPreview);
+  // Positions
+  catEl.style.left=(W*.08)+'px'; catEl.style.top=(H*.64)+'px';
+  customerEl.style.left=(W*.70)+'px'; customerEl.style.top=(H*.64)+'px';
+  bubbleEl.style.left=(W*.60)+'px'; bubbleEl.style.top=(H*.32)+'px';
+  pressHint.style.left='50%'; pressHint.style.bottom='22%';
+}
+
+function clamp(min,v,max){ return Math.max(min,Math.min(v,max)); }
+
+function drawPot(){
+  pot.removeChildren(); const s=W/360;
+  const sh=new PIXI.Graphics();sh.beginFill(0,0.15);sh.drawEllipse(0,42*s,30*s,6*s);sh.endFill();pot.addChild(sh);
+  const body=new PIXI.Graphics();body.beginFill(0x7B5EA7);body.drawRoundedRect(-30*s,0,60*s,40*s,8*s);body.endFill();body.lineStyle(3*s,0x5B3A7A);body.drawRoundedRect(-30*s,0,60*s,40*s,8*s);pot.addChild(body);
+  const rim=new PIXI.Graphics();rim.beginFill(0x9B6FC0);rim.drawEllipse(0,0,30*s,8*s);rim.endFill();rim.lineStyle(2*s,0x5B3A7A);rim.drawEllipse(0,0,30*s,8*s);pot.addChild(rim);
+  const liq=new PIXI.Graphics();liq.name='liquid';liq.beginFill(0xFFD166);liq.drawEllipse(0,-2*s,25*s,6*s);liq.endFill();liq.beginFill(0xFFD166);liq.drawRoundedRect(-25*s,-8*s,50*s,8*s,4*s);liq.endFill();pot.addChild(liq);
+  const el=new PIXI.Graphics();el.beginFill(0xFFFFFF);el.drawCircle(-10*s,18*s,6*s);el.endFill();el.beginFill(0x333);el.drawCircle(-9*s,19*s,3*s);el.endFill();pot.addChild(el);
+  const er=new PIXI.Graphics();er.beginFill(0xFFFFFF);er.drawCircle(10*s,18*s,6*s);er.endFill();er.beginFill(0x333);er.drawCircle(11*s,19*s,3*s);er.endFill();pot.addChild(er);
+  const hl=new PIXI.Graphics();hl.lineStyle(3*s,0x7B5EA7);hl.drawCircle(-30*s,20*s,6*s);pot.addChild(hl);
+  const hr=new PIXI.Graphics();hr.lineStyle(3*s,0x7B5EA7);hr.drawCircle(30*s,20*s,6*s);pot.addChild(hr);
+}
+
+function updateLiquid(color){
+  const liq=pot.getChildByName('liquid'); if(!liq)return; liq.clear();
+  const s=W/360; liq.beginFill(color); liq.drawEllipse(0,-2*s,25*s,6*s); liq.endFill(); liq.beginFill(color); liq.drawRoundedRect(-25*s,-8*s,50*s,8*s,4*s); liq.endFill();
+}
+
+// === PARTICLES ===
+const particles=[];
+function burst(n,color,x,y){
+  for(let i=0;i<n;i++){
+    const g=new PIXI.Graphics();const r=3+Math.random()*6;
+    if(i%2){g.beginFill(color,.7);g.drawStar(0,0,5,r,r*.5);g.endFill()}else{g.beginFill(color);g.drawCircle(0,0,r);g.endFill()}
+    g.x=x;g.y=y;fxLayer.addChild(g);
+    particles.push({g,vx:(Math.random()-.5)*8,vy:-(2+Math.random()*6),life:1});
+  }
+}
+
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.g.x+=p.vx*dt;p.g.y+=p.vy*dt;p.vy+=.2*dt;p.life-=.025*dt;p.g.alpha=Math.max(0,p.life);p.g.scale.set(p.life);
+    if(p.life<=0){fxLayer.removeChild(p.g);p.g.destroy();particles.splice(i,1)}
+  }
+}
+
+// === TWEENS ===
+const tweens=[];
+function tweenTo(obj,props,dur,ease,done){
+  const start={};for(const k in props)start[k]=obj[k]??0;
+  tweens.push({obj,props,start,dur,elapsed:0,ease:ease||(t=>t),done});
+}
+function easeOutCubic(t){return 1-Math.pow(1-t,3)}
+function easeOutBack(t){const c1=1.70158;return 1+(c1+1)*Math.pow(t-1,3)+c1*Math.pow(t-1,2)}
+function scalePop(obj,dur=.4){tweenTo(obj.scale,{x:1.3,y:1.3},dur*.4,easeOutBack,()=>tweenTo(obj.scale,{x:1,y:1},dur*.6,easeOutCubic))}
+
+// === GAME LOOP ===
+app.ticker.add(d=>{
+  const dt=d/60;
+  for(let i=tweens.length-1;i>=0;i--){const tw=tweens[i];tw.elapsed+=dt;const p=Math.min(tw.elapsed/tw.dur,1);const v=tw.ease(p);for(const k in tw.props)tw.obj[k]=tw.start[k]+(tw.props[k]-tw.start[k])*v;if(p>=1){tw.done?.();tweens.splice(i,1)}}
+  updateParticles(dt);
+});
+
+// === DOM UI ===
+function updateDots(){
+  stepDots.forEach((d,i)=>d.classList.toggle('active',i+1===step));
+}
+function renderBtns(){
+  stepRow.innerHTML='';btnFinish.style.display='none';
+  if(step===1){
+    stepTitle.textContent='① 选一个水果';
+    for(let i=0;i<STAGES[stageIdx].n;i++){
+      const b=document.createElement('div');b.className='btn-sel'+(i===pickedF?' selected':'');b.textContent=FRUITS[i].emoji;b.onclick=()=>pickFruit(i);stepRow.appendChild(b);
+    }
+  }else if(step===2){
+    stepTitle.textContent='② 选一个模具';
+    for(let i=0;i<MOLDS.length;i++){
+      const b=document.createElement('div');b.className='btn-sel'+(i===pickedM?' selected':'');b.textContent=MOLDS[i].emoji;b.onclick=()=>pickMold(i);stepRow.appendChild(b);
+    }
+  }else if(step===3){
+    stepTitle.textContent='③ 撒装饰粒（可多选）';btnFinish.style.display='block';
+    for(let i=0;i<DECORS.length;i++){
+      const b=document.createElement('div');b.className='btn-sel'+(pickedD.includes(i)?' selected':'');b.textContent=DECORS[i].emoji;b.onclick=()=>toggleDecor(i);stepRow.appendChild(b);
+    }
+    updateLolliPreview();
+  }
+}
+function goStep(s){if(locked)return;if(s===2&&pickedF<0){goStep(1);return}if(s===3&&pickedM<0){goStep(2);return}step=s;updateDots();renderBtns()}
+window.goStep=goStep;
+
+// === PICKING ===
+function pickFruit(i){
+  if(locked)return;sfx.tap();pickedF=i;renderBtns();
+  updateLiquid(FRUITS[i].color);
+  tweenTo(pot,{y:pot.y-4},.15,easeOutCubic,()=>tweenTo(pot,{y:pot.y+4},.15));
+  burst(8,FRUITS[i].color,pot.x,pot.y-10);sfx.pour();
+  setTimeout(()=>goStep(2),600);
+}
+function pickMold(i){
+  if(locked)return;sfx.tap();pickedM=i;renderBtns();updateLolliPreview();
+  setTimeout(()=>goStep(3),400);
+}
+function toggleDecor(i){
+  sfx.tap();const idx=pickedD.indexOf(i);if(idx>=0)pickedD.splice(idx,1);else pickedD.push(i);renderBtns();updateLolliPreview();
+}
+
+function updateLolliPreview(){
+  lolliPreview.removeChildren();lolliPreview.scale.set(0);
+  if(pickedF<0||pickedM<0)return;
+  const s=W/400;
+  const stick=new PIXI.Graphics();stick.beginFill(0xFFFFFF);stick.lineStyle(1,0xDDD);stick.drawRoundedRect(-4*s,0,8*s,40*s,3*s);stick.endFill();lolliPreview.addChild(stick);
+  const head=new PIXI.Graphics();head.beginFill(FRUITS[pickedF].color);head.drawCircle(0,-12*s,24*s);head.endFill();head.beginFill(0xFFFFFF,.2);head.drawCircle(-7*s,-17*s,5*s);head.endFill();lolliPreview.addChild(head);
+  scalePop(lolliPreview,.5);
+}
+
+// === FINISH ===
+function finish(){
+  if(locked||pickedF<0||pickedM<0)return;locked=true;sfx.pop();
+  tweenTo(pot,{y:pot.y-3},.2,easeOutCubic,()=>tweenTo(pot,{y:pot.y+3},.2));
+  burst(24,FRUITS[pickedF].color,pot.x,pot.y);burst(12,0xFFD700,pot.x,pot.y);
+  scalePop(lolliPreview,.6);
+  const correct=pickedF===targetF&&pickedM===targetM;
+  setTimeout(()=>{
+    coins+=correct?10:5;coinCount.textContent=coins;localStorage.setItem('mm_coins',coins);
+    updateStageBadge();
+    catEl.style.transform='scale(1.3)';setTimeout(()=>catEl.style.transform='',400);
+    sfx.correct();burst(16,0xFFD700,W*.12,H*.60);
+    bubbleEl.textContent=correct?'✨ 一模一样！':'😋 创新口味！';
+    pressHint.style.opacity='0';
+    setTimeout(()=>nextOrder(),2200);
+  },1200);
+}
+window.finish=finish;
+
+// === FLOW ===
+function nextOrder(){
+  locked=false;pickedF=-1;pickedM=-1;pickedD=[];lolliPreview.scale.set(0);
+  const s=STAGES[stageIdx];targetF=Math.floor(Math.random()*s.n);targetM=Math.floor(Math.random()*MOLDS.length);
+  let ci;do{ci=Math.floor(Math.random()*CUSTOMERS.length)}while(ci===lastCust&&CUSTOMERS.length>1);lastCust=ci;
+  customerEl.textContent=CUSTOMERS[ci];
+  bubbleEl.textContent=FRUITS[targetF].emoji+' + '+MOLDS[targetM].emoji;
+  pressHint.style.opacity='1';
+  goStep(1);
+}
+
+function updateStageBadge(){
+  for(let i=STAGES.length-1;i>=0;i--){if(coins>=STAGES[i].t){stageIdx=i;break}}
+  diffBadge.textContent=STAGES[stageIdx].s+' '+STAGES[stageIdx].name;
+}
+
+// === INIT ===
+function init(){
+  coinCount.textContent=coins;updateStageBadge();buildBg();nextOrder();
+  window.addEventListener('resize',()=>{buildBg()});
+}
+init();
+</script>
 </body>
 </html>
